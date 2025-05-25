@@ -172,11 +172,16 @@ if st.button("新增 / 賣出", key="trade", help="點擊送出交易", type="se
 
 with st.expander("💵 管理現金部位"):
     current_cash = portfolio.get("CASH", {}).get("shares", 0)
-    cash_input = st.number_input("現金部位金額", value=float(current_cash), step=1000.0)
-    if st.button("更新現金"):
-        portfolio["CASH"] = {"shares": cash_input, "cost": 1.0}
+    st.write(f"目前現金餘額：${current_cash:,.2f}")
+
+    add_cash = st.number_input("➕ 增加現金金額", min_value=0.0, step=100.0)
+    sub_cash = st.number_input("➖ 減少現金金額", min_value=0.0, step=100.0)
+
+    if st.button("更新現金餘額"):
+        new_cash = current_cash + add_cash - sub_cash
+        portfolio["CASH"] = {"shares": new_cash, "cost": 1.0}
         save_portfolio(portfolio)
-        st.success(f"已更新現金部位為 ${cash_input:,.0f}")
+        st.success(f"已更新現金部位為 ${new_cash:,.2f}")
         st.rerun()
 
 st.subheader("📋 投資組合總覽")
