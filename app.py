@@ -45,13 +45,13 @@ def calculate_value(pf):
     for symbol, data in pf.items():
         shares = data["shares"]
         cost = data["cost"]
-        if symbol == "CASH":
-            price = 1.0
-        elif shares < 0:
-            price = cost  # 當作賣出價格
-        else:
-            price = fetch_price(symbol)
-            price_cache[symbol] = price
+            if symbol == "CASH":
+        price = 1.0
+    elif shares < 0:
+        price = cost  # 當作賣出價格
+    else:
+        price = fetch_price(symbol)
+        price_cache[symbol] = price
         if price is not None:
             value = price * shares
             cost_total = cost * shares
@@ -197,6 +197,10 @@ if not df.empty:
         if st.button("🗑 確認刪除選取項目"):
             for symbol in selected_symbols:
                 if symbol in portfolio:
+                    cost = portfolio[symbol]["cost"]
+                    shares = portfolio[symbol]["shares"]
+                    refund = cost * shares
+                    portfolio["CASH"]["shares"] += refund
                     del portfolio[symbol]
             save_portfolio(portfolio)
             st.success("✅ 已刪除所選股票")
