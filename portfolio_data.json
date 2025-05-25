@@ -1,0 +1,46 @@
+{
+  "AAPL": {
+    "shares": 12,
+    "cost": 215.65
+  },
+  "AMD": {
+    "shares": 10,
+    "cost": 107.15
+  },
+  "AMZN": {
+    "shares": 2,
+    "cost": 199.723
+  },
+  "AVGO": {
+    "shares": 6,
+    "cost": 193.53
+  },
+  "CLS": {
+    "shares": 10,
+    "cost": 96.31
+  },
+  "META": {
+    "shares": 1,
+    "cost": 534.53
+  },
+  "NVDA": {
+    "shares": 35,
+    "cost": 146.2
+  },
+  "TSLA": {
+    "shares": 12,
+    "cost": 269.7
+  },
+  "AI": {
+    "shares": 20,
+    "cost": 22.87
+  },
+  "GOOGL": {
+    "shares": 2,
+    "cost": 154.1
+  },
+  "CASH": {
+    "shares": 1942,
+    "cost": 1.0
+  }
+}
