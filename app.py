@@ -45,12 +45,12 @@ def calculate_value(pf):
     for symbol, data in pf.items():
         shares = data["shares"]
         cost = data["cost"]
-        if symbol == "CASH":
-    price = 1.0
-elif shares < 0:
-    price = cost  # 當作賣出價格
-else:
-    price = fetch_price(symbol)
+            if symbol == "CASH":
+        price = 1.0
+    elif shares < 0:
+        price = cost  # 當作賣出價格
+    else:
+        price = fetch_price(symbol)
         price_cache[symbol] = price
         if price is not None:
             value = price * shares
