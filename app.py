@@ -182,17 +182,15 @@ with st.expander("💵 管理現金部位"):
 st.subheader("📋 投資組合總覽")
 df, total_value, _ = calculate_value(portfolio)
 if not df.empty:
-    for i, row in df.iterrows():
-        cols = st.columns([6, 1])
-        with cols[0]:
-            st.markdown(f"📌 **{row['股票代碼']}** | 股數: {row['股數']} | 現值: ${row['現值']}")
-        with cols[1]:
-            if row["股票代碼"] != "CASH":
-                if st.button("❌", key=f"delete_stock_{i}"):
-                    del portfolio[row["股票代碼"]]
-                    save_portfolio(portfolio)
-                    st.success(f"已刪除持股 {row['股票代碼']}")
-                    st.rerun()
+    selected_symbols = st.multiselect("選擇欲刪除的股票持倉：", [row["股票代碼"] for _, row in df.iterrows() if row["股票代碼"] != "CASH"])
+    if selected_symbols:
+        if st.button("🗑 確認刪除選取項目"):
+            for symbol in selected_symbols:
+                if symbol in portfolio:
+                    del portfolio[symbol]
+            save_portfolio(portfolio)
+            st.success("✅ 已刪除所選股票")
+            st.rerun()
     st.dataframe(df, use_container_width=True)
     draw_pie_chart(df)
 
