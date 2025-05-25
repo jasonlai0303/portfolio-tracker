@@ -179,6 +179,7 @@ with st.expander("💵 管理現金部位"):
         st.success(f"已更新現金部位為 ${cash_input:,.0f}")
         st.rerun()
 
+
 st.subheader("📋 投資組合總覽")
 df, total_value, _ = calculate_value(portfolio)
 if not df.empty:
@@ -193,6 +194,9 @@ if not df.empty:
             st.rerun()
     st.dataframe(df, use_container_width=True)
     draw_pie_chart(df)
+
+
+
 
 st.markdown(f"### 💰 總資產淨值：<span style='color:#00ff88'> $ {total_value:,.2f} </span>", unsafe_allow_html=True)
 save_net_value_history(total_value)
