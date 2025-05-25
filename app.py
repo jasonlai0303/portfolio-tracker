@@ -52,25 +52,29 @@ def calculate_value(pf):
             cost_total = cost * shares
             profit_rate = ((value - cost_total) / cost_total * 100) if cost_total != 0 else 0
             total += value
-            result.append({
+            row = {
                 "股票代碼": symbol,
                 "股數": shares,
                 "現價": round(price, 2),
                 "成本價": cost,
                 "現值": round(value, 2),
-                "成本總額": round(cost_total, 2),
-                "報酬率": f"{profit_rate:.2f}%"
-            })
+                "成本總額": round(cost_total, 2)
+            }
+            if symbol != "CASH":
+                row["報酬率"] = f"{profit_rate:.2f}%"
+            result.append(row)
         else:
-            result.append({
+            row = {
                 "股票代碼": symbol,
                 "股數": shares,
                 "現價": "錯誤",
                 "成本價": cost,
                 "現值": "錯誤",
-                "成本總額": cost * shares,
-                "報酬率": "N/A"
-            })
+                "成本總額": cost * shares
+            }
+            if symbol != "CASH":
+                row["報酬率"] = "N/A"
+            result.append(row)
     return pd.DataFrame(result), round(total, 2), price_cache
 
 def save_net_value_history(latest_value):
@@ -113,34 +117,48 @@ with col3:
 
 if st.button("新增 / 賣出", key="trade", help="點擊送出交易", type="secondary"):
     if symbol:
+        if "CASH" not in portfolio:
+            portfolio["CASH"] = {"shares": 0.0, "cost": 1.0}
+
         if symbol in portfolio:
             old_shares = portfolio[symbol]["shares"]
             old_cost = portfolio[symbol]["cost"]
             if shares > 0:
-                new_shares = old_shares + shares
-                new_cost = ((old_cost * old_shares + cost * shares) / new_shares)
-                portfolio[symbol]["cost"] = round(new_cost, 2)
-                portfolio[symbol]["shares"] = new_shares
+                total_cost = cost * shares
+                if portfolio["CASH"]["shares"] < total_cost:
+                    st.error("💸 現金餘額不足，無法完成此次買入。")
+                else:
+                    new_shares = old_shares + shares
+                    new_cost = ((old_cost * old_shares + cost * shares) / new_shares)
+                    portfolio[symbol]["cost"] = round(new_cost, 2)
+                    portfolio[symbol]["shares"] = new_shares
+                    portfolio["CASH"]["shares"] -= total_cost
             else:
                 sell_shares = min(-shares, old_shares)
                 price = 1.0 if symbol == "CASH" else fetch_price(symbol)
-                realized = (price - old_cost) * sell_shares * (1 - 0.001)
+                proceeds = price * sell_shares * (1 - 0.001)
                 realized_profit.append({
                     "股票代碼": symbol,
                     "賣出價格": round(price, 2),
                     "成本價": old_cost,
                     "數量": sell_shares,
-                    "實現損益": round(realized, 2),
+                    "實現損益": round((price - old_cost) * sell_shares * (1 - 0.001), 2),
                     "日期": datetime.now().strftime("%Y-%m-%d")
                 })
                 portfolio[symbol]["shares"] -= sell_shares
+                portfolio["CASH"]["shares"] += proceeds
         else:
-            portfolio[symbol] = {"shares": shares, "cost": cost}
+            total_cost = cost * shares
+            if portfolio["CASH"]["shares"] < total_cost:
+                st.error("💸 現金餘額不足，無法完成此次買入。")
+            else:
+                portfolio[symbol] = {"shares": shares, "cost": cost}
+                portfolio["CASH"]["shares"] -= total_cost
 
-        if portfolio[symbol]["shares"] <= 0:
+        if symbol in portfolio and portfolio[symbol]["shares"] <= 0:
             del portfolio[symbol]
             st.success(f"🗑 已清空持股 {symbol}")
-        else:
+        elif symbol in portfolio:
             price = 1.0 if symbol == "CASH" else fetch_price(symbol)
             shares_now = portfolio[symbol]["shares"]
             avg_cost = portfolio[symbol]["cost"]
