@@ -140,7 +140,7 @@ if st.button("新增 / 賣出", key="trade", help="點擊送出交易", type="se
                     portfolio["CASH"]["shares"] -= total_cost
             else:
                 sell_shares = min(-shares, old_shares)
-                price = 1.0 if symbol == "CASH" else fetch_price(symbol)
+                price = 1.0 if symbol == "CASH" else cost if shares < 0 else fetch_price(symbol)
                 proceeds = price * sell_shares * (1 - 0.001)
                 realized_profit.append({
                     "股票代碼": symbol,
@@ -191,6 +191,7 @@ with st.expander("💵 管理現金部位"):
 
 st.subheader("📋 投資組合總覽")
 df, total_value, _ = calculate_value(portfolio)
+    df["現值"] = df["現值"].apply(lambda x: round(x, 2) if isinstance(x, (int, float)) else x)
 if not df.empty:
     selected_symbols = st.multiselect("選擇欲刪除的股票持倉：", [row["股票代碼"] for _, row in df.iterrows() if row["股票代碼"] != "CASH"])
     if selected_symbols:
