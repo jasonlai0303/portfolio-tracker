@@ -245,18 +245,19 @@ if not realized_df.empty:
     if selected_rows:
         if st.button("🗑 確認刪除所選損益紀錄"):
             for idx in sorted([int(i) for i in selected_rows], reverse=True):
-            profit_entry = realized_profit[idx]
-            portfolio["CASH"]["shares"] -= profit_entry.get("實現損益", 0)
-            symbol = profit_entry.get("股票代碼")
-            qty = profit_entry.get("數量", 0)
-            cost = profit_entry.get("成本價", 0)
-            if symbol:
-                if symbol in portfolio:
-                    portfolio[symbol]["shares"] += qty
-                else:
-                    portfolio[symbol] = {"shares": qty, "cost": cost}
-            realized_profit.pop(idx)
+                profit_entry = realized_profit[idx]
+                portfolio["CASH"]["shares"] -= profit_entry.get("實現損益", 0)
+                symbol = profit_entry.get("股票代碼")
+                qty = profit_entry.get("數量", 0)
+                cost = profit_entry.get("成本價", 0)
+                if symbol:
+                    if symbol in portfolio:
+                        portfolio[symbol]["shares"] += qty
+                    else:
+                        portfolio[symbol] = {"shares": qty, "cost": cost}
+                realized_profit.pop(idx)
             save_realized_profit(realized_profit)
+            save_portfolio(portfolio)
             st.success("✅ 已刪除所選損益紀錄")
             st.rerun()
     st.dataframe(realized_df.drop(columns="index"), use_container_width=True)
