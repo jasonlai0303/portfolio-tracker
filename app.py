@@ -55,10 +55,10 @@ def calculate_value(pf):
             row = {
                 "股票代碼": symbol,
                 "股數": shares,
-                "現價": round(price, 3),
+                "現價": round(price, 2),
                 "成本價": cost,
-                "現值": round(value, 3),
-                "成本總額": round(cost_total, 3)
+                "現值": round(value, 2),
+                "成本總額": round(cost_total, 2)
             }
             if symbol != "CASH":
                 row["報酬率"] = f"{profit_rate:.2f}%"
@@ -102,7 +102,7 @@ def draw_pie_chart(df):
         st.plotly_chart(fig, use_container_width=True)
 
 st.set_page_config(page_title="資產管理器", layout="wide")
-st.title("📊 Portfolio tracker")
+st.title("📊 我的資產管理器")
 
 portfolio = load_portfolio()
 realized_profit = load_realized_profit()
@@ -245,7 +245,17 @@ if not realized_df.empty:
     if selected_rows:
         if st.button("🗑 確認刪除所選損益紀錄"):
             for idx in sorted([int(i) for i in selected_rows], reverse=True):
-                realized_profit.pop(idx)
+            profit_entry = realized_profit[idx]
+            portfolio["CASH"]["shares"] -= profit_entry.get("實現損益", 0)
+            symbol = profit_entry.get("股票代碼")
+            qty = profit_entry.get("數量", 0)
+            cost = profit_entry.get("成本價", 0)
+            if symbol:
+                if symbol in portfolio:
+                    portfolio[symbol]["shares"] += qty
+                else:
+                    portfolio[symbol] = {"shares": qty, "cost": cost}
+            realized_profit.pop(idx)
             save_realized_profit(realized_profit)
             st.success("✅ 已刪除所選損益紀錄")
             st.rerun()
