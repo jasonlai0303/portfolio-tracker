@@ -55,10 +55,10 @@ def calculate_value(pf):
             row = {
                 "股票代碼": symbol,
                 "股數": shares,
-                "現價": round(price, 2),
+                "現價": round(price, 3),
                 "成本價": cost,
-                "現值": round(value, 2),
-                "成本總額": round(cost_total, 2)
+                "現值": round(value, 3),
+                "成本總額": round(cost_total, 3)
             }
             if symbol != "CASH":
                 row["報酬率"] = f"{profit_rate:.2f}%"
@@ -102,7 +102,7 @@ def draw_pie_chart(df):
         st.plotly_chart(fig, use_container_width=True)
 
 st.set_page_config(page_title="資產管理器", layout="wide")
-st.title("📊 我的資產管理器")
+st.title("📊 Portfolio tracker")
 
 portfolio = load_portfolio()
 realized_profit = load_realized_profit()
