@@ -107,7 +107,7 @@ def draw_pie_chart(df):
         st.plotly_chart(fig, use_container_width=True)
 
 st.set_page_config(page_title="資產管理器", layout="wide")
-st.title("📊 我的資產管理器")
+st.title("📊 Portfolio Tracker")
 
 portfolio = load_portfolio()
 realized_profit = load_realized_profit()
