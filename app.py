@@ -182,6 +182,17 @@ with st.expander("💵 管理現金部位"):
 st.subheader("📋 投資組合總覽")
 df, total_value, _ = calculate_value(portfolio)
 if not df.empty:
+    for i, row in df.iterrows():
+        cols = st.columns([6, 1])
+        with cols[0]:
+            st.markdown(f"📌 **{row['股票代碼']}** | 股數: {row['股數']} | 現值: ${row['現值']}")
+        with cols[1]:
+            if row["股票代碼"] != "CASH":
+                if st.button("❌", key=f"delete_stock_{i}"):
+                    del portfolio[row["股票代碼"]]
+                    save_portfolio(portfolio)
+                    st.success(f"已刪除持股 {row['股票代碼']}")
+                    st.rerun()
     st.dataframe(df, use_container_width=True)
     draw_pie_chart(df)
 
@@ -226,6 +237,15 @@ else:
 st.subheader("💼 已實現損益紀錄")
 realized_df = pd.DataFrame(realized_profit)
 if not realized_df.empty:
-    st.dataframe(realized_df, use_container_width=True)
+    for i, row in realized_df.iterrows():
+        cols = st.columns([6, 1])
+        with cols[0]:
+            st.markdown(f"📌 **{row['日期']}** | {row['股票代碼']}：{row['數量']} 股，損益：${row['實現損益']}")
+        with cols[1]:
+            if st.button("❌", key=f"del_rp_{i}"):
+                realized_profit.pop(i)
+                save_realized_profit(realized_profit)
+                st.success(f"已刪除損益紀錄：{row['股票代碼']}（{row['日期']}）")
+                st.rerun()
 else:
     st.info("尚無已實現損益資料。")
