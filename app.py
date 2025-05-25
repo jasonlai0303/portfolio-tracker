@@ -59,7 +59,7 @@ def calculate_value(pf):
             total += value
             row = {
                 "股票代碼": symbol,
-                "股數": shares,
+                "股數": int(round(shares)),
                 "現價": round(price, 2),
                 "成本價": cost,
                 "現值": round(value, 2),
