@@ -3,7 +3,7 @@ import yfinance as yf
 import json
 import os
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime
 import plotly.express as px
 
 PORTFOLIO_FILE = "portfolio_data.json"
@@ -172,13 +172,12 @@ if st.button("新增 / 賣出", key="trade", help="點擊送出交易", type="se
 
 with st.expander("💵 管理現金部位"):
     current_cash = portfolio.get("CASH", {}).get("shares", 0)
-    cash_input = st.number_input("現金部位金額", value=current_cash, step=1000)
+    cash_input = st.number_input("現金部位金額", value=float(current_cash), step=1000.0)
     if st.button("更新現金"):
         portfolio["CASH"] = {"shares": cash_input, "cost": 1.0}
         save_portfolio(portfolio)
         st.success(f"已更新現金部位為 ${cash_input:,.0f}")
         st.rerun()
-
 
 st.subheader("📋 投資組合總覽")
 df, total_value, _ = calculate_value(portfolio)
@@ -194,9 +193,6 @@ if not df.empty:
             st.rerun()
     st.dataframe(df, use_container_width=True)
     draw_pie_chart(df)
-
-
-
 
 st.markdown(f"### 💰 總資產淨值：<span style='color:#00ff88'> $ {total_value:,.2f} </span>", unsafe_allow_html=True)
 save_net_value_history(total_value)
@@ -239,15 +235,15 @@ else:
 st.subheader("💼 已實現損益紀錄")
 realized_df = pd.DataFrame(realized_profit)
 if not realized_df.empty:
-    for i, row in realized_df.iterrows():
-        cols = st.columns([6, 1])
-        with cols[0]:
-            st.markdown(f"📌 **{row['日期']}** | {row['股票代碼']}：{row['數量']} 股，損益：${row['實現損益']}")
-        with cols[1]:
-            if st.button("❌", key=f"del_rp_{i}"):
-                realized_profit.pop(i)
-                save_realized_profit(realized_profit)
-                st.success(f"已刪除損益紀錄：{row['股票代碼']}（{row['日期']}）")
-                st.rerun()
+    realized_df["index"] = realized_df.index.astype(str)
+    selected_rows = st.multiselect("選擇欲刪除的損益紀錄：", realized_df["index"], format_func=lambda x: f"{realized_df.loc[int(x), '日期']} - {realized_df.loc[int(x), '股票代碼']} ({realized_df.loc[int(x), '數量']} 股) 損益 ${realized_df.loc[int(x), '實現損益']}")
+    if selected_rows:
+        if st.button("🗑 確認刪除所選損益紀錄"):
+            for idx in sorted([int(i) for i in selected_rows], reverse=True):
+                realized_profit.pop(idx)
+            save_realized_profit(realized_profit)
+            st.success("✅ 已刪除所選損益紀錄")
+            st.rerun()
+    st.dataframe(realized_df.drop(columns="index"), use_container_width=True)
 else:
     st.info("尚無已實現損益資料。")
