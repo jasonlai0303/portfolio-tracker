@@ -191,7 +191,7 @@ with st.expander("💵 管理現金部位"):
 
 st.subheader("📋 投資組合總覽")
 df, total_value, _ = calculate_value(portfolio)
-    df["現值"] = df["現值"].apply(lambda x: round(x, 2) if isinstance(x, (int, float)) else x)
+df["現值"] = df["現值"].apply(lambda x: round(x, 2) if isinstance(x, (int, float)) else x)
 if not df.empty:
     selected_symbols = st.multiselect("選擇欲刪除的股票持倉：", [row["股票代碼"] for _, row in df.iterrows() if row["股票代碼"] != "CASH"])
     if selected_symbols:
