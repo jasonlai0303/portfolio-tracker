@@ -45,7 +45,12 @@ def calculate_value(pf):
     for symbol, data in pf.items():
         shares = data["shares"]
         cost = data["cost"]
-        price = 1.0 if symbol == "CASH" else fetch_price(symbol)
+        if symbol == "CASH":
+    price = 1.0
+elif shares < 0:
+    price = cost  # 當作賣出價格
+else:
+    price = fetch_price(symbol)
         price_cache[symbol] = price
         if price is not None:
             value = price * shares
@@ -113,7 +118,7 @@ with col1:
 with col2:
     shares = st.number_input("持股數量（買入為正，賣出為負）", value=1, step=1)
 with col3:
-    cost = st.number_input("每股成本（已含手續費）", min_value=0.0, step=0.1)
+    cost = st.number_input("每股成本（買入時）或賣出價格（賣出時）", min_value=0.0, step=0.1)
 
 if st.button("新增 / 賣出", key="trade", help="點擊送出交易", type="secondary"):
     if symbol:
@@ -171,7 +176,7 @@ if st.button("新增 / 賣出", key="trade", help="點擊送出交易", type="se
         st.rerun()
 
 with st.expander("💵 管理現金部位"):
-    current_cash = portfolio.get("CASH", {}).get("shares", 0)
+    current_cash = round(portfolio.get("CASH", {}).get("shares", 0), 2)
     st.write(f"目前現金餘額：${current_cash:,.2f}")
 
     add_cash = st.number_input("➕ 增加現金金額", min_value=0.0, step=100.0)
