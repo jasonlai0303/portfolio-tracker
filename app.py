@@ -211,18 +211,18 @@ if not df.empty:
         if symbol == "CASH":
             return symbol
         else:
-            return f"[{symbol}](https://www.google.com/search?q={symbol}+investor+relations)"
+            return f"{symbol} 🔽"
 
-    def symbol_to_link(symbol):
+    def symbol_to_html(symbol):
         if symbol == "CASH":
             return symbol
         else:
             ir_link = f"https://www.google.com/search?q={symbol}+investor+relations"
             sec_link = f"https://www.sec.gov/edgar/search/#/q={symbol}"
-            return f"{symbol} 🔗 [[IR]]({ir_link}) [[10-K/Q]]({sec_link})"
+            return f"<span>{symbol}</span><br><a href='{ir_link}' target='_blank'>IR</a> | <a href='{sec_link}' target='_blank'>10-K/Q</a>"
 
-    df["股票代碼"] = df["股票代碼"].apply(symbol_to_link)
-    st.markdown(df.to_markdown(index=False), unsafe_allow_html=True)
+    df["股票代碼"] = df["股票代碼"].apply(symbol_to_html)
+    st.markdown(df.to_html(index=False, escape=False), unsafe_allow_html=True)
     draw_pie_chart(df)
 
 st.markdown(f"### 💰 總資產淨值：<span style='color:#00ff88'> $ {total_value:,.2f} </span>", unsafe_allow_html=True)
