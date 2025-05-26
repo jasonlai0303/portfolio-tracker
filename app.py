@@ -107,7 +107,7 @@ def draw_pie_chart(df):
         st.plotly_chart(fig, use_container_width=True)
 
 st.set_page_config(page_title="資產管理器", layout="wide")
-st.title("📊 Portfolio Tracker")
+st.title("📊 我的資產管理器")
 
 portfolio = load_portfolio()
 realized_profit = load_realized_profit()
@@ -206,7 +206,23 @@ if not df.empty:
             save_portfolio(portfolio)
             st.success("✅ 已刪除所選股票")
             st.rerun()
-    st.dataframe(df, use_container_width=True)
+    # 將股票代碼轉為超連結
+    def symbol_to_link(symbol):
+        if symbol == "CASH":
+            return symbol
+        else:
+            return f"[{symbol}](https://www.google.com/search?q={symbol}+investor+relations)"
+
+    def symbol_to_link(symbol):
+        if symbol == "CASH":
+            return symbol
+        else:
+            ir_link = f"https://www.google.com/search?q={symbol}+investor+relations"
+            sec_link = f"https://www.sec.gov/edgar/search/#/q={symbol}"
+            return f"{symbol} 🔗 [[IR]]({ir_link}) [[10-K/Q]]({sec_link})"
+
+    df["股票代碼"] = df["股票代碼"].apply(symbol_to_link)
+    st.markdown(df.to_markdown(index=False), unsafe_allow_html=True)
     draw_pie_chart(df)
 
 st.markdown(f"### 💰 總資產淨值：<span style='color:#00ff88'> $ {total_value:,.2f} </span>", unsafe_allow_html=True)
