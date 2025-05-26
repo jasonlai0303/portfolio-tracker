@@ -222,7 +222,13 @@ if not df.empty:
             return f"<span>{symbol}</span><br><a href='{ir_link}' target='_blank'>IR</a> | <a href='{sec_link}' target='_blank'>10-K/Q</a>"
 
     df["股票代碼"] = df["股票代碼"].apply(symbol_to_html)
-    st.markdown(df.to_html(index=False, escape=False), unsafe_allow_html=True)
+    st.markdown(
+        f"<div style='display: flex; justify-content: center;'>"
+        f"<div style='min-width: 95%;'>"
+        f"{df.to_html(index=False, escape=False)}"
+        f"</div></div>",
+        unsafe_allow_html=True
+    )
     draw_pie_chart(df)
 
 st.markdown(f"### 💰 總資產淨值：<span style='color:#00ff88'> $ {total_value:,.2f} </span>", unsafe_allow_html=True)
